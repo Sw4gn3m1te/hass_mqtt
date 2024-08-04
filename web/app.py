@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from ..client import MqttClient
+from client import MqttClient
 
 app = Flask(__name__)
 
