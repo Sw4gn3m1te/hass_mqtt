@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Stack</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button data-value="+10">+10</button>
+        <button data-value="+1">+1</button>
+        <button data-value="-1">-1</button>
+        <button data-value="-10">-10</button>
+    </div>
+
+    <script>
+        document.querySelectorAll('.button-container button').forEach(button => {
+            button.addEventListener('click', () => {
+                const value = button.getAttribute('data-value');
+                fetch('/button-click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
