@@ -1,7 +1,9 @@
 import paho.mqtt.client as mqtt
 import configparser
+import os
 
-import win_control
+if os.name == "nt":
+    import win_control
 import time
 
 
@@ -28,8 +30,10 @@ class MqttClient(mqtt.Client):
     def on_message(self, mqttc, obj, msg):
         print(f"{msg.topic}: {msg.payload}")
         try:
-            if msg.topic.endswith("win_vol"):
-                win_control.set_volume(int(msg.payload))
+            if msg.topic.endswith("win_vol") and os.name == "nt":
+                current_volume = win_control.get_volume()
+                new_volume = current_volume + int(msg.payload)
+                win_control.set_volume(new_volume)
         except Exception as e:
             print(e)
 

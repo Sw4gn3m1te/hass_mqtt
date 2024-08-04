@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from client import MqttClient
-import win_control
+from ..client import MqttClient
 
 app = Flask(__name__)
 
@@ -18,9 +17,7 @@ def index():
 def button_click():
     data = request.get_json()
     value = int(data.get('value'))
-    current_volume = win_control.get_volume()
-    new_volume = current_volume + value
-    client.publish("hass/web/win_vol", new_volume, 0)
+    client.publish("hass/web/win_vol", value, 0)
     return jsonify({'message': 'Button click registered'})
 
 
