@@ -3,7 +3,7 @@ from client import MqttClient
 
 app = Flask(__name__)
 
-SECRET_PATH = "../secret.ini"
+SECRET_PATH = "./secret.ini"
 client = MqttClient()
 client.start(SECRET_PATH)
 
