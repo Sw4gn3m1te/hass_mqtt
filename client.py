@@ -22,18 +22,45 @@ class MqttClient(mqtt.Client):
     
     def __init__(self):
         super().__init__(mqtt.CallbackAPIVersion.VERSION2)
+        if os.name == "nt":
+            self.win_controller = win_control.WinController()
+        else:
+            self.win_controller = None
     
     def on_connect(self, mqttc, obj, flags, reason_code, properties):
         print("rc: " + str(reason_code))
         self.subscribe("hass/desktop/win_vol")
+        self.subscribe("hass/desktop/kb")
+        self.subscribe("hass/desktop/ctrl")
 
     def on_message(self, mqttc, obj, msg):
         print(f"{msg.topic}: {msg.payload}")
+
+        try:
+            data = int(msg.payload)
+        except Exception as e:
+            try:
+                data = str(msg.payload.decode("utf-8").lower())
+            except Exception as e:
+                print(e)
+
         try:
             if msg.topic.endswith("win_vol") and os.name == "nt":
-                current_volume = win_control.get_volume()
-                new_volume = current_volume + int(msg.payload)
-                win_control.set_volume(new_volume)
+                current_volume = self.win_controller.get_volume()
+                new_volume = current_volume + data
+                self.win_controller.set_volume(new_volume)
+
+            elif msg.topic.endswith("ctrl") and os.name == "nt":
+                if data == "shutdown":
+                    self.win_controller.shutdown()
+
+            elif msg.topic.endswith("kb") and os.name == "nt":
+                print(f"sending key {data}")
+                self.win_controller.press_key(data)
+
+            else:
+                pass
+
         except Exception as e:
             print(e)
 

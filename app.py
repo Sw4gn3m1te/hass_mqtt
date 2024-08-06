@@ -16,9 +16,29 @@ def index():
 @app.route('/button-click', methods=['POST'])
 def button_click():
     data = request.get_json()
-    value = int(data.get('value'))
-    client.publish("hass/web/win_vol", value, 0)
+    try:
+        value = int(data.get('value'))
+        client.publish("hass/web/win_vol", value, 0)
+    except Exception as e:
+        print(e)
+        try:
+            value = str(data.get('value'))
+            client.publish("hass/web/ctrl", value, 0)
+        except Exception as e:
+            print(e)
+
     return jsonify({'message': 'Button click registered'})
+
+
+@app.route('/key-press', methods=['POST'])
+def key_press():
+    data = request.get_json()
+    key = data.get('key')
+    try:
+        client.publish("hass/web/kb", key, 0)
+    except Exception as e:
+        print(e)
+    return jsonify({'message': 'Key press registered'})
 
 
 if __name__ == '__main__':
